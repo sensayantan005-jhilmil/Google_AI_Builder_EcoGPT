@@ -14,14 +14,12 @@ import {
   ShieldCheck,
   AlertTriangle,
   Globe2,
-  Cpu,
-  Cloud
+  Cpu
 } from 'lucide-react';
 import { MetricsOverview } from './components/MetricsOverview';
 import { FutureTransformationVisual } from './components/FutureTransformationVisual';
 import { DiseasePreventionMasterplan } from './components/DiseasePreventionMasterplan';
 import { VisualPlots } from './components/VisualPlots';
-import { GcpDeploymentModal } from './components/GcpDeploymentModal';
 import {
   runFullAssessmentAsync,
   EnvironmentalAssessment
@@ -51,7 +49,6 @@ export default function App() {
   const [reportSource, setReportSource] = useState<string>('gemini-3.1-flash-lite');
   const [selectedModel, setSelectedModel] = useState<string>('gemini-3.1-flash-lite');
   const [statusMessage, setStatusMessage] = useState<string>('');
-  const [isDeployModalOpen, setIsDeployModalOpen] = useState<boolean>(false);
 
   // Run full assessment for any location
   const handleAnalyzeLocation = async (targetQuery: string) => {
@@ -226,16 +223,6 @@ If this strategic plan is faithfully executed, ${newAssessment.location.city} wi
           </div>
 
           <div className="flex items-center gap-2.5">
-            {/* Deploy to Cloud Run Button */}
-            <button
-              onClick={() => setIsDeployModalOpen(true)}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-emerald-600/20 hover:from-cyan-600/30 hover:to-emerald-600/30 border border-cyan-500/40 text-cyan-300 hover:text-white px-2.5 py-1 rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer"
-              title="Google Cloud Run Deployment Center"
-            >
-              <Cloud className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span className="hidden sm:inline">Deploy to</span> Cloud Run
-            </button>
-
             {/* AI Model Selector */}
             <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 text-xs">
               <Cpu className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -460,26 +447,12 @@ If this strategic plan is faithfully executed, ${newAssessment.location.city} wi
             </span>
           </div>
           <div className="flex items-center gap-3 text-[11px]">
-            <button
-              onClick={() => setIsDeployModalOpen(true)}
-              className="text-cyan-400 hover:text-cyan-300 underline font-medium flex items-center gap-1 cursor-pointer"
-            >
-              <Cloud className="w-3 h-3" />
-              Google Cloud Run Deployment Center
-            </button>
-            <span className="text-slate-700">•</span>
             <span className="text-slate-500">
               Gemini 3.8 Flash • WHO 2021 &amp; IPCC AR6 Models
             </span>
           </div>
         </div>
       </footer>
-
-      {/* Interactive Google Cloud Run Deployment Center Modal */}
-      <GcpDeploymentModal
-        isOpen={isDeployModalOpen}
-        onClose={() => setIsDeployModalOpen(false)}
-      />
 
     </div>
   );
