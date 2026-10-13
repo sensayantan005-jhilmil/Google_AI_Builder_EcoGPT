@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile holding metadata and preferences",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Unique Firebase Authentication UID",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 128
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Avatar photo URL",
+          "maxLength": 512
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Account registration timestamp",
+          "maxLength": 64
+        }
+      },
+      "required": ["userId", "email"]
+    },
+    "SavedAssessment": {
+      "title": "SavedAssessment",
+      "description": "Persistent saved environmental assessment and masterplan",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique assessment document ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "city": {
+          "type": "string",
+          "description": "Diagnosed city name",
+          "maxLength": 100
+        },
+        "country": {
+          "type": "string",
+          "description": "Country name or code",
+          "maxLength": 100
+        },
+        "aqiScore": {
+          "type": "number",
+          "description": "Air Quality Index numeric score"
+        },
+        "aqiCategory": {
+          "type": "string",
+          "description": "AQI health category descriptor",
+          "maxLength": 64
+        },
+        "treeTarget": {
+          "type": "number",
+          "description": "Target trees to plant"
+        },
+        "roofArea": {
+          "type": "number",
+          "description": "Rooftop area in square meters for rainwater harvesting"
+        },
+        "co2AbsorbedTons": {
+          "type": "number",
+          "description": "Calculated annual metric tons of CO2 sequestered"
+        },
+        "harvestLiters": {
+          "type": "number",
+          "description": "Rainwater harvested in liters per year"
+        },
+        "uhiCoolingC": {
+          "type": "number",
+          "description": "Microclimate cooling reduction in Celsius"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Short diagnostic summary snippet",
+          "maxLength": 1000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when assessment was saved",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "city", "country", "aqiScore", "treeTarget"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Private user profile documents keyed by userId"
+    },
+    "/savedAssessments/{assessmentId}": {
+      "schema": "SavedAssessment",
+      "description": "User environmental diagnostics and masterplans"
+    }
+  }
+}

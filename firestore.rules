@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'email']) &&
+        data.keys().hasOnly(['userId', 'email', 'displayName', 'photoURL', 'createdAt']) &&
+        data.userId is string && data.userId == request.auth.uid &&
+        data.email is string && data.email.size() <= 256 &&
+        (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 128)) &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 512)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64));
+    }
+
+    function isValidSavedAssessment(data) {
+      return data.keys().hasAll(['id', 'userId', 'city', 'country', 'aqiScore', 'treeTarget']) &&
+        data.keys().hasOnly(['id', 'userId', 'city', 'country', 'aqiScore', 'aqiCategory', 'treeTarget', 'roofArea', 'co2AbsorbedTons', 'harvestLiters', 'uhiCoolingC', 'summary', 'createdAt']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == request.auth.uid &&
+        data.city is string && data.city.size() <= 100 &&
+        data.country is string && data.country.size() <= 100 &&
+        data.aqiScore is number &&
+        data.treeTarget is number &&
+        (!('aqiCategory' in data) || (data.aqiCategory is string && data.aqiCategory.size() <= 64)) &&
+        (!('roofArea' in data) || data.roofArea is number) &&
+        (!('co2AbsorbedTons' in data) || data.co2AbsorbedTons is number) &&
+        (!('harvestLiters' in data) || data.harvestLiters is number) &&
+        (!('uhiCoolingC' in data) || data.uhiCoolingC is number) &&
+        (!('summary' in data) || (data.summary is string && data.summary.size() <= 1000)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64));
+    }
+
+    // User profiles (private to the authenticated owner)
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming()) &&
+        incoming().userId == existing().userId;
+      allow delete: if isOwner(userId) && isValidId(userId);
+    }
+
+    // Saved assessments & Masterplans
+    match /savedAssessments/{assessmentId} {
+      allow get: if isSignedIn() && isValidId(assessmentId) && existing().userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(assessmentId) && isValidSavedAssessment(incoming()) && incoming().id == assessmentId;
+      allow update: if isSignedIn() && isValidId(assessmentId) && isValidSavedAssessment(incoming()) &&
+        existing().userId == request.auth.uid && incoming().userId == existing().userId && incoming().id == existing().id;
+      allow delete: if isSignedIn() && isValidId(assessmentId) && existing().userId == request.auth.uid;
+    }
+  }
+}
