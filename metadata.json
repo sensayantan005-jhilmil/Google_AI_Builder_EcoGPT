@@ -1,0 +1,6 @@
+{
+  "name": "EcoGPT — Environmental Advisory & Carbon Intelligence",
+  "description": "AI-powered geospatial environmental advisory platform providing native species recommendations, air quality intelligence, rainwater harvesting forecasts, and carbon sequestration trajectory modeling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
